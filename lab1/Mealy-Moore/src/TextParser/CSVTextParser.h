@@ -6,10 +6,15 @@
 class CSVTextParser : public ITextParser<Machine>
 {
 public:
+    CSVTextParser(const MachineType& machineType)
+        : m_machineType(machineType)
+    {
+    }
+
     Machine GetData(std::istream& istream) override
     {
         auto machine = new Machine;
-        istream
+
         return ITextParser::GetData(istream);
     }
 
@@ -17,4 +22,7 @@ public:
     {
         return ITextParser::SetData(ostream, data);
     }
+
+private:
+    const MachineType m_machineType;
 };
