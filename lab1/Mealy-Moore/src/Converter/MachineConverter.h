@@ -14,7 +14,7 @@ public:
 
         SetInitialStatesAndOutputData(newMachine, newStates);
         SetInputData(newMachine, machine.inputData);
-        SetTransitionData(newMachine, newStates);
+        SetTransitionData(newMachine, machine, newStates);
         return newMachine;
     }
 
@@ -69,8 +69,36 @@ private:
         machine.inputData = inputData;
     }
 
-    void static SetTransitionData(Machine& machine, const std::map<std::string, MachineState>& newStates)
+    void static SetTransitionData(Machine& machine, const Machine& oldMachine, const std::map<std::string, MachineState>& newStates)
     {
-        machine.inputData = inputData;
+        int inputsCount = machine.inputData.size();
+        int statesCount = machine.states.size();
+        std::vector<MachineState> test(1, MachineState());
+
+        for (auto indexI = 0; indexI < inputsCount; indexI++)
+        {
+            machine.machineStates.emplace_back(std::vector<MachineState>(statesCount, MachineState()));
+        }
+
+        for (auto indexJ = 0; indexJ < statesCount; indexJ++)
+        {
+            auto stateFrom = machine.states.at(indexJ);
+            auto initialStateIt = std::find_if(newStates.begin(), newStates.end(), [&](const std::pair<std::string, MachineState>& element) {
+                return element.first == stateFrom;
+            });
+            auto initialState = initialStateIt->second;
+
+            auto indexOfNewStates = std::distance(oldMachine.states.begin(), std::find(oldMachine.states.begin(), oldMachine.states.end(), initialState.state));
+
+            for (auto indexI = 0; indexI < inputsCount; indexI++)
+            {
+                auto oldState = oldMachine.machineStates.at(indexI).at(indexOfNewStates);
+
+                auto it = std::find_if(newStates.begin(), newStates.end(), [&](const std::pair<std::string, MachineState>& element) {
+                    return element.second == oldState;
+                });
+                machine.machineStates.at(indexI).at(indexJ).state = it->first;
+            }
+        }
     }
 };
