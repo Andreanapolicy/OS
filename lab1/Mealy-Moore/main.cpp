@@ -1,6 +1,10 @@
 #include <iostream>
+#include <memory>
 #include <optional>
+#include <sstream>
+#include <fstream>
 #include "src/Common/Automat.h"
+#include "src/TextParser/CSVTextParser.h"
 
 struct Args
 {
@@ -38,6 +42,11 @@ std::optional<Args> ParseArgs(int argc, char* argv[])
     return args;
 }
 
+void FillMachine(Machine& machine, const Args& args)
+{
+
+}
+
 int main(int argc, char* argv[])
 {
     auto args = ParseArgs(argc, argv);
@@ -46,6 +55,28 @@ int main(int argc, char* argv[])
         std::cout << "Wrong usage. Example: .exe mealy-to-moore input.csv output.csv" << std::endl;
         return 1;
     }
+
+    auto textParser = std::make_unique<CSVTextParser>(args->machineType);
+
+    std::ifstream input;
+    input.open(args->inputFile);
+
+    if (!input.is_open())
+    {
+        std::cout << "Input file couldn't be opened" << std::endl;
+        return 1;
+    }
+
+    std::ofstream output;
+    output.open(args->outputFile);
+
+    if (!output.is_open())
+    {
+        std::cout << "Output file couldn't be opened" << std::endl;
+        return 1;
+    }
+
+    Machine machine = textParser->GetData(input);
 
     return 0;
 }
