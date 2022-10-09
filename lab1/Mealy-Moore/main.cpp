@@ -87,6 +87,9 @@ int main(int argc, char* argv[])
             ? MachineConverter::GetMooreMachineFromMealy(machine)
             : MachineConverter::GetMealyMachineFromMoore(machine);
 
-    MachineSaver::Save(output, convertedMachine, args->machineType == MachineType::Mealy ? MachineType::Moore : MachineType::Mealy);
+    args->machineType == MachineType::Mealy
+        ? MachineSaver::SaveMealyMachine(output, convertedMachine)
+        : MachineSaver::SaveMooreMachine(output, convertedMachine);
+
     return 0;
 }

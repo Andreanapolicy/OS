@@ -5,14 +5,7 @@
 class MachineSaver
 {
 public:
-    void static Save(std::ostream& output, const Machine& machine, const MachineType& machineType)
-    {
-        machineType == MachineType::Mealy
-            ? SaveMealyMachine(output, machine)
-            : SaveMooreMachine(output, machine);
-    }
 
-private:
     void static SaveMealyMachine(std::ostream& output, const Machine& machine)
     {
         SaveAloneStates(output, machine.states, true);
@@ -25,6 +18,8 @@ private:
         SaveAloneStates(output, machine.states, true);
         SaveTransitions(output, machine);
     }
+
+private:
 
     void static SaveAloneStates(std::ostream& output, const std::vector<std::string>& states, bool needToSkipFirstValue = false)
     {
