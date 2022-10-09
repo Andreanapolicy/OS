@@ -20,7 +20,9 @@ public:
 
     Machine static GetMealyMachineFromMoore(const Machine& machine)
     {
-        return {};
+        Machine newMachine = machine;
+
+        return newMachine;
     }
 
 private:
