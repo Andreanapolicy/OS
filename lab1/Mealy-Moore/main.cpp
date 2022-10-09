@@ -1,7 +1,6 @@
 #include <iostream>
 #include <memory>
 #include <optional>
-#include <sstream>
 #include <fstream>
 #include "src/Common/Automat.h"
 #include "src/TextParser/CSVTextParser.h"

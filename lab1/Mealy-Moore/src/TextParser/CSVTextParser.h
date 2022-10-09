@@ -22,10 +22,6 @@ public:
         return machine;
     }
 
-    void SetData(std::ostream& ostream, const Machine& data)
-    {
-    }
-
 private:
     void ProcessMealyInputData(std::istream& istream, Machine& machine) const
     {
@@ -33,14 +29,16 @@ private:
         std::getline(istream, line);
         std::vector<std::string> parsedLine;
         ParseLine(line, parsedLine);
-        std::remove(parsedLine.begin(), parsedLine.end(), "");
+        parsedLine.erase(parsedLine.begin());
         machine.states = parsedLine;
 
         while (std::getline(istream, line))
         {
             std::vector<std::string> values;
             ParseLine(line, values);
-
+            machine.inputData.push_back(values.at(0));
+            values.erase(values.begin());
+            FillMachineStateTransitions(machine, values);
         }
     }
 
@@ -49,7 +47,30 @@ private:
 
     }
 
-    void ParseLine(std::string& line, std::vector<std::string> states) const
+    void FillMachineStateTransitions(Machine& machine, std::vector<std::string>& transitions) const
+    {
+        std::vector<MachineState> machineStates;
+
+        for (const auto& transition : transitions)
+        {
+            MachineState state;
+            auto it = transition.find("/");
+            if (it != std::string::npos)
+            {
+                state.state = transition.substr(0, it);
+                state.outputData = transition.substr(it + 1, transition.length());
+            }
+            else
+            {
+                state.state = transition;
+            }
+            machineStates.push_back(state);
+        }
+
+        machine.machineStates.push_back(machineStates);
+    }
+
+    void ParseLine(std::string& line, std::vector<std::string>& states) const
     {
         std::string state;
         std::istringstream ss(line);

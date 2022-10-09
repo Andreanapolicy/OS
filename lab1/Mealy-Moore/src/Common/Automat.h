@@ -13,7 +13,7 @@ enum class MachineType
 struct MachineState
 {
     std::string state;
-    std::optional<std::string> outputData;
+    std::optional<std::string> outputData = std::nullopt;
 };
 
 struct Machine
