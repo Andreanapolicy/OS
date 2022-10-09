@@ -43,7 +43,7 @@ private:
     {
         for (const auto& [key, value]: machineMap)
         {
-            if (value.state == state.state)
+            if (value == state)
             {
                 return true;
             }

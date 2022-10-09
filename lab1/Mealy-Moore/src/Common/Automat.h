@@ -14,6 +14,11 @@ struct MachineState
 {
     std::string state;
     std::optional<std::string> outputData = std::nullopt;
+
+    bool operator==(const MachineState& machineState) const
+    {
+        return this->state == machineState.state && this->outputData == machineState.outputData;
+    }
 };
 
 struct Machine
