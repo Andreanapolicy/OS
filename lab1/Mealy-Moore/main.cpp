@@ -4,6 +4,8 @@
 #include <fstream>
 #include "src/Common/Automat.h"
 #include "src/TextParser/CSVTextParser.h"
+#include "src/Converter/MachineConverter.h"
+#include "src/MachineSaver/MachineSaver.h"
 
 struct Args
 {
@@ -81,6 +83,10 @@ int main(int argc, char* argv[])
     }
 
     Machine machine = textParser->GetData(input);
+    auto convertedMachine = args->machineType == MachineType::Mealy
+            ? MachineConverter::GetMooreMachineFromMealy(machine)
+            : MachineConverter::GetMealyMachineFromMoore(machine);
 
+    MachineSaver::Save(output, convertedMachine, args->machineType == MachineType::Mealy ? MachineType::Moore : MachineType::Mealy);
     return 0;
 }
