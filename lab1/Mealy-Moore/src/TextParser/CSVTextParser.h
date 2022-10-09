@@ -15,15 +15,17 @@ public:
     {
         Machine machine = {};
 
-        m_machineType == MachineType::Mealy
-            ? ProcessMealyInputData(istream, machine)
-            : ProcessMooreInputData(istream, machine);
+        if (m_machineType == MachineType::Moore)
+        {
+            ProcessSpecificMachineInputData(istream, machine);
+        }
+        ProcessTypicalMachineInputData(istream, machine);
 
         return machine;
     }
 
 private:
-    void ProcessMealyInputData(std::istream& istream, Machine& machine) const
+    void static ProcessTypicalMachineInputData(std::istream& istream, Machine& machine)
     {
         std::string line;
         std::getline(istream, line);
@@ -42,27 +44,34 @@ private:
         }
     }
 
-    void ProcessMooreInputData(std::istream& istream, Machine& machine) const
+    void static ProcessSpecificMachineInputData(std::istream& istream, Machine& machine)
     {
-
+        std::string line;
+        std::getline(istream, line);
+        std::vector<std::string> parsedLine;
+        ParseLine(line, parsedLine);
+        parsedLine.erase(parsedLine.begin());
+        machine.outputData = parsedLine;
     }
 
-    void FillMachineStateTransitions(Machine& machine, std::vector<std::string>& transitions) const
+    void static FillMachineStateTransitions(Machine& machine, std::vector<std::string>& transitions)
     {
         std::vector<MachineState> machineStates;
 
         for (const auto& transition : transitions)
         {
             MachineState state;
-            auto it = transition.find("/");
-            if (it != std::string::npos)
+            auto index = transition.find("/");
+            if (index != std::string::npos)
             {
-                state.state = transition.substr(0, it);
-                state.outputData = transition.substr(it + 1, transition.length());
+                state.state = transition.substr(0, index);
+                state.outputData = transition.substr(index + 1, transition.length());
             }
             else
             {
+                auto it = std::find(machine.states.begin(), machine.states.end(), transition);
                 state.state = transition;
+                state.outputData = machine.outputData.at(std::distance(machine.states.begin(), it));
             }
             machineStates.push_back(state);
         }
@@ -70,7 +79,7 @@ private:
         machine.machineStates.push_back(machineStates);
     }
 
-    void ParseLine(std::string& line, std::vector<std::string>& states) const
+    void static ParseLine(std::string& line, std::vector<std::string>& states)
     {
         std::string state;
         std::istringstream ss(line);
