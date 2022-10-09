@@ -22,7 +22,7 @@ public:
 private:
     std::map<std::string, MachineState> static CreateMapStates(const Machine& machine)
     {
-        std::string newStateName = {GetRandomLetter(machine.states.at(0).at(0))};
+        std::string newStateName = {GetNewLetter(machine.states.at(0).at(0))};
         std::map<std::string, MachineState> transitionMap;
 
         for (auto const& transitionLine: machine.machineStates)
@@ -31,7 +31,7 @@ private:
             {
                 if (!isValueExist(transitionMap, state))
                 {
-                    transitionMap.insert(std::make_pair(newStateName + (char)transitionMap.size(), state));
+                    transitionMap.insert(std::make_pair(newStateName + std::to_string(transitionMap.size()), state));
                 }
             }
         }
