@@ -19,6 +19,7 @@ struct MachineState
 struct Machine
 {
     std::vector<std::string> inputData;
+    std::vector<std::string> states;
     std::vector<std::vector<MachineState>> machineStates;
     std::vector<std::string> outputData;
 };
