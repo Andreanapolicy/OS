@@ -41,11 +41,6 @@ std::optional<Args> ParseArgs(int argc, char* argv[])
     return args;
 }
 
-void FillMachine(Machine& machine, const Args& args)
-{
-
-}
-
 int main(int argc, char* argv[])
 {
     auto args = ParseArgs(argc, argv);
