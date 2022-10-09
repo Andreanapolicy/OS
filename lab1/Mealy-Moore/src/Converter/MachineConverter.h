@@ -11,7 +11,11 @@ public:
     {
         Machine newMachine;
         auto newStates = CreateMapStates(machine);
-        return {};
+
+        SetInitialStatesAndOutputData(newMachine, newStates);
+        SetInputData(newMachine, machine.inputData);
+        SetTransitionData(newMachine, newStates);
+        return newMachine;
     }
 
     Machine static GetMealyMachineFromMoore(const Machine& machine)
@@ -49,5 +53,24 @@ private:
             }
         }
         return false;
+    }
+
+    void static SetInitialStatesAndOutputData(Machine& machine, const std::map<std::string, MachineState>& newStates)
+    {
+        for (auto const& state : newStates)
+        {
+            machine.states.push_back(state.first);
+            machine.outputData.push_back(*state.second.outputData);
+        }
+    }
+
+    void static SetInputData(Machine& machine, const std::vector<std::string>& inputData)
+    {
+        machine.inputData = inputData;
+    }
+
+    void static SetTransitionData(Machine& machine, const std::map<std::string, MachineState>& newStates)
+    {
+        machine.inputData = inputData;
     }
 };
