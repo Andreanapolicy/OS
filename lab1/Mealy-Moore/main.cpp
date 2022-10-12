@@ -73,7 +73,6 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    auto textParser = std::make_unique<CSVTextParser>(args->machineType);
 
     std::ifstream input;
     std::ofstream output;
@@ -82,14 +81,17 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    Machine machine = textParser->GetData(input);
-    auto convertedMachine = args->machineType == MachineType::Mealy
-            ? MachineConverter::GetMooreMachineFromMealy(machine)
-            : MachineConverter::GetMealyMachineFromMoore(machine);
-
-    args->machineType == MachineType::Mealy
-        ? MachineSaver::SaveMealyMachine(output, convertedMachine)
-        : MachineSaver::SaveMooreMachine(output, convertedMachine);
+    Machine machine;
+    if (args->machineType == MachineType::Mealy)
+    {
+        machine = CSVTextParser::GetMealy(input);
+        MachineSaver::SaveMooreMachine(output, MachineConverter::GetMooreMachineFromMealy(machine));
+    }
+    else
+    {
+        machine = CSVTextParser::GetMoore(input);
+        MachineSaver::SaveMealyMachine(output, MachineConverter::GetMealyMachineFromMoore(machine));
+    }
 
     return 0;
 }

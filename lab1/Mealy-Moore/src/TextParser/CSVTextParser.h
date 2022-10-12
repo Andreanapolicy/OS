@@ -6,19 +6,20 @@
 class CSVTextParser
 {
 public:
-    explicit CSVTextParser(const MachineType& machineType)
-        : m_machineType(machineType)
-    {
-    }
-
-    Machine GetData(std::istream& istream)
+    static Machine GetMealy(std::istream& istream)
     {
         Machine machine = {};
 
-        if (m_machineType == MachineType::Moore)
-        {
-            ProcessSpecificMachineInputData(istream, machine);
-        }
+        ProcessTypicalMachineInputData(istream, machine);
+
+        return machine;
+    }
+
+    static Machine GetMoore(std::istream& istream)
+    {
+        Machine machine = {};
+
+        ProcessSpecificMachineInputData(istream, machine);
         ProcessTypicalMachineInputData(istream, machine);
 
         return machine;
@@ -89,6 +90,4 @@ private:
             states.push_back(state);
         }
     }
-
-    const MachineType m_machineType;
 };
