@@ -5,13 +5,7 @@
 class MachineMinimizator
 {
 public:
-    static Machine MinimizeMoore(const Machine& machine)
-    {
-        return {};
-    }
+    static Machine MinimizeMoore(const Machine& machine);
 
-    static Machine MinimizeMealy(const Machine& machine)
-    {
-        return {};
-    }
+    static Machine MinimizeMealy(const Machine& machine);
 };
