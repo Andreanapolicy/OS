@@ -115,7 +115,18 @@ Machine MachineMinimizator::MinimizeMoore(const Machine& machine)
 
 void MachineMinimizator::MinimizeMachine(MachineWithEquivalentStates& machine, const Machine& originMachine)
 {
+    int countOfEquivalentStates = 0;
+    int currentCountOfEquivalentStates = GetCountOfEquivalentStates(machine);
+    while (countOfEquivalentStates != currentCountOfEquivalentStates && currentCountOfEquivalentStates != machine.states.size())
+    {
+        auto transitionsForEquivalentStates = GetTransitionsToStates(machine);
+        machine.equivalentStates = CreateNewEquivalentStates(transitionsForEquivalentStates, machine.equivalentStates);
+        SetTransitionWithNewEquivalentStates(machine, originMachine);
+        countOfEquivalentStates = currentCountOfEquivalentStates;
+        currentCountOfEquivalentStates = GetCountOfEquivalentStates(machine);
+    }
 
+    CreateNewMachineByEquivalentStates(machine, originMachine);
 }
 
 void MachineMinimizator::SetTransitionWithNewEquivalentStates(MachineWithEquivalentStates& machine, const Machine& originMachine)
