@@ -3,6 +3,7 @@
 #include "unordered_map"
 #include "../Common/Lettering.h"
 #include <stdexcept>
+#include <set>
 
 namespace
 {
@@ -46,6 +47,36 @@ namespace
 
         return newEquivalentStates;
     }
+
+    StateToTransition GetTransitionsToStates(const MachineWithEquivalentStates& machine)
+    {
+        StateToTransition transitionsForEquivalentStates;
+        int inputsCount = machine.inputData.size();
+        int statesCount = machine.states.size();
+
+        for (auto indexI = 0; indexI < statesCount; indexI++)
+        {
+            std::string states;
+            for (auto indexJ = 0; indexJ < inputsCount; indexJ++)
+            {
+                states += machine.machineStates.at(indexJ).at(indexI).state;
+            }
+            transitionsForEquivalentStates.emplace(std::pair<std::string, std::string>{machine.states.at(indexI), states});
+        }
+
+        return transitionsForEquivalentStates;
+    }
+
+    int GetCountOfEquivalentStates(const MachineWithEquivalentStates& machine)
+    {
+        std::set<std::string> equivalentStates;
+        for (const auto& equivalentState : machine.equivalentStates)
+        {
+            equivalentStates.insert(equivalentState.second);
+        }
+
+        return equivalentStates.size();
+    }
 }
 
 Machine MachineMinimizator::MinimizeMealy(const Machine& machine)
@@ -68,7 +99,7 @@ Machine MachineMinimizator::MinimizeMealy(const Machine& machine)
     newMachine.equivalentStates = CreateNewEquivalentStates(transitionsForEquivalentStates, newMachine.equivalentStates);
 
     SetTransitionWithNewEquivalentStates(newMachine, machine);
-    MinimizeMachine(newMachine);
+    MinimizeMachine(newMachine, machine);
 
     return newMachine;
 }
@@ -78,11 +109,11 @@ Machine MachineMinimizator::MinimizeMoore(const Machine& machine)
     MachineWithEquivalentStates newMachine = {machine.inputData, machine.states, machine.machineStates, machine.outputData};
     //create equivalentStates
     SetTransitionWithNewEquivalentStates(newMachine, machine);
-    MinimizeMachine(newMachine);
+    MinimizeMachine(newMachine, machine);
     return newMachine;
 }
 
-void MachineMinimizator::MinimizeMachine(Machine& machine)
+void MachineMinimizator::MinimizeMachine(MachineWithEquivalentStates& machine, const Machine& originMachine)
 {
 
 }
@@ -110,4 +141,9 @@ void MachineMinimizator::SetTransitionWithNewEquivalentStates(MachineWithEquival
             machine.machineStates.at(indexI).at(indexJ).outputData = originMachine.machineStates.at(indexI).at(indexJ).outputData;
         }
     }
+}
+
+void MachineMinimizator::CreateNewMachineByEquivalentStates(MachineWithEquivalentStates& machine, const Machine& originMachine)
+{
+
 }
