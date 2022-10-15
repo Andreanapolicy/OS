@@ -1,19 +1,43 @@
 #include "MachineMinimizator.h"
 
 #include "unordered_map"
+#include "../Common/Lettering.h"
 
 namespace
 {
     struct MachineWithEquivalentStates : public Machine
     {
-        std::unordered_map<std::string, MachineState> equivalentStates;
+        std::unordered_map<std::string, std::string> equivalentStates;
     };
 
-    struct StateToTransitions
+    std::unordered_map<std::string, std::string> CreateNewEquivalentStates(const std::unordered_map<std::string, std::string>& transitionsForEquivalentStates)
     {
-        std::string state;
-        std::string transitions;
-    };
+        auto newEquivalentStates = transitionsForEquivalentStates;
+        std::string newStateName = {GetNewLetter(newEquivalentStates.begin()->second.at(0))};
+
+        auto index = 0;
+        for (auto transition = newEquivalentStates.begin(); transition != newEquivalentStates.end(); transition++)
+        {
+            if (transition->second.at(0) == newStateName.at(0))
+            {
+                continue;
+            }
+
+            auto replacementTransition= transition->second;
+            transition->second = newStateName + std::to_string(index);
+            index++;
+
+            for (auto sameTransition = transition; sameTransition != newEquivalentStates.end(); sameTransition++)
+            {
+                if (sameTransition->second == replacementTransition)
+                {
+                    sameTransition->second = newStateName + std::to_string(std::distance(newEquivalentStates.begin(), transition));
+                }
+            }
+        }
+
+        return newEquivalentStates;
+    }
 }
 
 Machine MachineMinimizator::MinimizeMealy(const Machine& machine)
@@ -33,7 +57,9 @@ Machine MachineMinimizator::MinimizeMealy(const Machine& machine)
         transitionsForEquivalentStates.emplace(std::pair<std::string, std::string>{newMachine.states.at(indexI), states});
     }
 
-    return {};
+    newMachine.equivalentStates = CreateNewEquivalentStates(transitionsForEquivalentStates);
+
+    return newMachine;
 }
 
 Machine MachineMinimizator::MinimizeMoore(const Machine& machine)
