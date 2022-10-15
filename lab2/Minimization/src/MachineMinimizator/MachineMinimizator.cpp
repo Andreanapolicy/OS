@@ -2,6 +2,7 @@
 
 #include "unordered_map"
 #include "../Common/Lettering.h"
+#include <stdexcept>
 
 namespace
 {
@@ -66,10 +67,47 @@ Machine MachineMinimizator::MinimizeMealy(const Machine& machine)
 
     newMachine.equivalentStates = CreateNewEquivalentStates(transitionsForEquivalentStates, newMachine.equivalentStates);
 
+    SetTransitionWithNewEquivalentStates(newMachine, machine);
+    MinimizeMachine(newMachine);
+
     return newMachine;
 }
 
 Machine MachineMinimizator::MinimizeMoore(const Machine& machine)
 {
-    return {};
+    MachineWithEquivalentStates newMachine = {machine.inputData, machine.states, machine.machineStates, machine.outputData};
+    //create equivalentStates
+    SetTransitionWithNewEquivalentStates(newMachine, machine);
+    MinimizeMachine(newMachine);
+    return newMachine;
+}
+
+void MachineMinimizator::MinimizeMachine(Machine& machine)
+{
+
+}
+
+void MachineMinimizator::SetTransitionWithNewEquivalentStates(MachineWithEquivalentStates& machine, const Machine& originMachine)
+{
+    int inputsCount = machine.inputData.size();
+    int statesCount = machine.states.size();
+
+    for (auto indexJ = 0; indexJ < statesCount; indexJ++)
+    {
+        auto currentState = machine.states.at(indexJ);
+
+        for (auto indexI = 0; indexI < inputsCount; indexI++)
+        {
+            auto originState = originMachine.machineStates.at(indexI).at(indexJ).state;
+            auto it = machine.equivalentStates.find(originState);
+
+            if (it == machine.equivalentStates.end())
+            {
+                throw std::runtime_error("");
+            }
+
+            machine.machineStates.at(indexI).at(indexJ).state = it->second;
+            machine.machineStates.at(indexI).at(indexJ).outputData = originMachine.machineStates.at(indexI).at(indexJ).outputData;
+        }
+    }
 }
