@@ -5,12 +5,14 @@
 
 namespace
 {
+    using StateToTransition = std::unordered_map<std::string, std::string>;
+
     struct MachineWithEquivalentStates : public Machine
     {
-        std::unordered_map<std::string, std::string> equivalentStates;
+        StateToTransition equivalentStates;
     };
 
-    std::unordered_map<std::string, std::string> CreateNewEquivalentStates(const std::unordered_map<std::string, std::string>& transitionsForEquivalentStates)
+    StateToTransition CreateNewEquivalentStates(const StateToTransition& transitionsForEquivalentStates, const StateToTransition& oldEquivalentStates)
     {
         auto newEquivalentStates = transitionsForEquivalentStates;
         std::string newStateName = {GetNewLetter(newEquivalentStates.begin()->second.at(0))};
@@ -27,9 +29,14 @@ namespace
             transition->second = newStateName + std::to_string(index);
             index++;
 
+            auto equivalentStateOfInitiator = oldEquivalentStates.find(transition->first);
+
             for (auto sameTransition = transition; sameTransition != newEquivalentStates.end(); sameTransition++)
             {
-                if (sameTransition->second == replacementTransition)
+                auto equivalentStateOfCurrent = oldEquivalentStates.find(sameTransition->first);
+
+                if (sameTransition->second == replacementTransition && (equivalentStateOfInitiator == oldEquivalentStates.end()
+                    || equivalentStateOfInitiator->second == equivalentStateOfCurrent->second))
                 {
                     sameTransition->second = newStateName + std::to_string(std::distance(newEquivalentStates.begin(), transition));
                 }
@@ -43,7 +50,7 @@ namespace
 Machine MachineMinimizator::MinimizeMealy(const Machine& machine)
 {
     MachineWithEquivalentStates newMachine = {machine.inputData, machine.states, machine.machineStates, machine.outputData};
-    std::unordered_map<std::string, std::string> transitionsForEquivalentStates;
+    StateToTransition transitionsForEquivalentStates;
     int inputsCount = newMachine.inputData.size();
     int statesCount = newMachine.states.size();
 
@@ -57,7 +64,7 @@ Machine MachineMinimizator::MinimizeMealy(const Machine& machine)
         transitionsForEquivalentStates.emplace(std::pair<std::string, std::string>{newMachine.states.at(indexI), states});
     }
 
-    newMachine.equivalentStates = CreateNewEquivalentStates(transitionsForEquivalentStates);
+    newMachine.equivalentStates = CreateNewEquivalentStates(transitionsForEquivalentStates, newMachine.equivalentStates);
 
     return newMachine;
 }
