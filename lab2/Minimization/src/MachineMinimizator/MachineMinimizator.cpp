@@ -1,13 +1,13 @@
 #include "MachineMinimizator.h"
 
-#include "unordered_map"
+#include "map"
 #include "../Common/Lettering.h"
 #include <stdexcept>
 #include <set>
 
 namespace
 {
-    using StateToTransition = std::unordered_map<std::string, std::string>;
+    using StateToTransition = std::map<std::string, std::string>;
 
     struct MachineWithEquivalentStates : public Machine
     {
@@ -40,7 +40,7 @@ namespace
                 if (sameTransition->second == replacementTransition && (equivalentStateOfInitiator == oldEquivalentStates.end()
                     || equivalentStateOfInitiator->second == equivalentStateOfCurrent->second))
                 {
-                    sameTransition->second = newStateName + std::to_string(std::distance(newEquivalentStates.begin(), transition));
+                    sameTransition->second = transition->second;
                 }
             }
         }
