@@ -99,21 +99,19 @@ Machine MachineMinimizator::MinimizeMealy(const Machine& machine)
     newMachine.equivalentStates = CreateNewEquivalentStates(transitionsForEquivalentStates, newMachine.equivalentStates);
 
     SetTransitionWithNewEquivalentStates(newMachine, machine);
-    MinimizeMachine(newMachine, machine);
 
-    return newMachine;
+    return MinimizeMachine(newMachine, machine);
 }
 
 Machine MachineMinimizator::MinimizeMoore(const Machine& machine)
 {
     MachineWithEquivalentStates newMachine = {machine.inputData, machine.states, machine.machineStates, machine.outputData};
-    //create equivalentStates
+    //TODO: create equivalentStates
     SetTransitionWithNewEquivalentStates(newMachine, machine);
-    MinimizeMachine(newMachine, machine);
-    return newMachine;
+    return MinimizeMachine(newMachine, machine);
 }
 
-void MachineMinimizator::MinimizeMachine(MachineWithEquivalentStates& machine, const Machine& originMachine)
+Machine MachineMinimizator::MinimizeMachine(MachineWithEquivalentStates& machine, const Machine& originMachine)
 {
     int countOfEquivalentStates = 0;
     int currentCountOfEquivalentStates = GetEquivalentStates(machine).size();
@@ -126,7 +124,7 @@ void MachineMinimizator::MinimizeMachine(MachineWithEquivalentStates& machine, c
         currentCountOfEquivalentStates = GetEquivalentStates(machine).size();
     }
 
-    CreateNewMachineByEquivalentStates(machine, originMachine);
+    return CreateNewMachineByEquivalentStates(machine, originMachine);
 }
 
 void MachineMinimizator::SetTransitionWithNewEquivalentStates(MachineWithEquivalentStates& machine, const Machine& originMachine)
@@ -154,7 +152,7 @@ void MachineMinimizator::SetTransitionWithNewEquivalentStates(MachineWithEquival
     }
 }
 
-void MachineMinimizator::CreateNewMachineByEquivalentStates(MachineWithEquivalentStates& machine, const Machine& originMachine)
+Machine MachineMinimizator::CreateNewMachineByEquivalentStates(MachineWithEquivalentStates& machine, const Machine& originMachine)
 {
     Machine newMachine;
     newMachine.inputData = machine.inputData;
@@ -163,9 +161,12 @@ void MachineMinimizator::CreateNewMachineByEquivalentStates(MachineWithEquivalen
     std::copy(setNewStates.begin(), setNewStates.end(), newMachine.states.begin());
     std::sort(newMachine.states.begin(), newMachine.states.end());
 
+    int inputsCount = newMachine.inputData.size();
+    int statesCount = newMachine.states.size();
+
     if (!std::empty(originMachine.outputData))
     {
-        for (auto index = 0; index < newMachine.states.size(); index++)
+        for (auto index = 0; index < statesCount; index++)
         {
             auto it = machine.equivalentStates.find(newMachine.states.at(index));
             auto distance = std::distance(originMachine.states.begin(), std::find(originMachine.states.begin(), originMachine.states.end(), it->first));
@@ -173,8 +174,29 @@ void MachineMinimizator::CreateNewMachineByEquivalentStates(MachineWithEquivalen
         }
     }
 
-    for (auto index = 0; index < newMachine.inputData.size(); index++)
+    for (auto index = 0; index < inputsCount; index++)
     {
-        newMachine.machineStates.emplace_back(std::vector<MachineState>(newMachine.states.size(), MachineState()));
+        newMachine.machineStates.emplace_back(std::vector<MachineState>(statesCount, MachineState()));
     }
+
+    for (auto indexJ = 0; indexJ < statesCount; indexJ++)
+    {
+        auto currentState = newMachine.states.at(indexJ);
+        auto originState = std::find_if(machine.equivalentStates.begin(), machine.equivalentStates.end(), [=](const std::pair<std::string, std::string>& element){
+            return element.second == currentState;
+        });
+        auto it = std::find(originMachine.states.begin(), originMachine.states.end(), originState->first);
+        auto distance = std::distance(originMachine.states.begin(), it);
+
+        for (auto indexI = 0; indexI < inputsCount; indexI++)
+        {
+            MachineState oldState = originMachine.machineStates.at(indexI).at(distance);
+            auto newState = machine.equivalentStates.find(oldState.state);
+
+            newMachine.machineStates.at(indexI).at(indexJ).state = newState->second;
+            newMachine.machineStates.at(indexI).at(indexJ).outputData = oldState.outputData;
+        }
+    }
+
+    return newMachine;
 }
