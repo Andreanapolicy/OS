@@ -67,7 +67,7 @@ namespace
         return transitionsForEquivalentStates;
     }
 
-    int GetCountOfEquivalentStates(const MachineWithEquivalentStates& machine)
+    std::set<std::string> GetEquivalentStates(const MachineWithEquivalentStates& machine)
     {
         std::set<std::string> equivalentStates;
         for (const auto& equivalentState : machine.equivalentStates)
@@ -75,7 +75,7 @@ namespace
             equivalentStates.insert(equivalentState.second);
         }
 
-        return equivalentStates.size();
+        return equivalentStates;
     }
 }
 
@@ -116,14 +116,14 @@ Machine MachineMinimizator::MinimizeMoore(const Machine& machine)
 void MachineMinimizator::MinimizeMachine(MachineWithEquivalentStates& machine, const Machine& originMachine)
 {
     int countOfEquivalentStates = 0;
-    int currentCountOfEquivalentStates = GetCountOfEquivalentStates(machine);
+    int currentCountOfEquivalentStates = GetEquivalentStates(machine).size();
     while (countOfEquivalentStates != currentCountOfEquivalentStates && currentCountOfEquivalentStates != machine.states.size())
     {
         auto transitionsForEquivalentStates = GetTransitionsToStates(machine);
         machine.equivalentStates = CreateNewEquivalentStates(transitionsForEquivalentStates, machine.equivalentStates);
         SetTransitionWithNewEquivalentStates(machine, originMachine);
         countOfEquivalentStates = currentCountOfEquivalentStates;
-        currentCountOfEquivalentStates = GetCountOfEquivalentStates(machine);
+        currentCountOfEquivalentStates = GetEquivalentStates(machine).size();
     }
 
     CreateNewMachineByEquivalentStates(machine, originMachine);
@@ -156,5 +156,25 @@ void MachineMinimizator::SetTransitionWithNewEquivalentStates(MachineWithEquival
 
 void MachineMinimizator::CreateNewMachineByEquivalentStates(MachineWithEquivalentStates& machine, const Machine& originMachine)
 {
+    Machine newMachine;
+    newMachine.inputData = machine.inputData;
+    auto setNewStates = GetEquivalentStates(machine);
+    newMachine.states = std::vector<std::string>(setNewStates.size());
+    std::copy(setNewStates.begin(), setNewStates.end(), newMachine.states.begin());
+    std::sort(newMachine.states.begin(), newMachine.states.end());
 
+    if (!std::empty(originMachine.outputData))
+    {
+        for (auto index = 0; index < newMachine.states.size(); index++)
+        {
+            auto it = machine.equivalentStates.find(newMachine.states.at(index));
+            auto distance = std::distance(originMachine.states.begin(), std::find(originMachine.states.begin(), originMachine.states.end(), it->first));
+            newMachine.outputData.push_back(originMachine.outputData.at(distance));
+        }
+    }
+
+    for (auto index = 0; index < newMachine.inputData.size(); index++)
+    {
+        newMachine.machineStates.emplace_back(std::vector<MachineState>(newMachine.states.size(), MachineState()));
+    }
 }
