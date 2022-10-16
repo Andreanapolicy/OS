@@ -106,7 +106,15 @@ Machine MachineMinimizator::MinimizeMealy(const Machine& machine)
 Machine MachineMinimizator::MinimizeMoore(const Machine& machine)
 {
     MachineWithEquivalentStates newMachine = {machine.inputData, machine.states, machine.machineStates, machine.outputData};
-    //TODO: create equivalentStates
+
+    StateToTransition transitionsForEquivalentStates;
+
+    for (auto indexI = 0; indexI < machine.states.size(); indexI++)
+    {
+        transitionsForEquivalentStates.emplace(std::pair<std::string, std::string>{machine.states.at(indexI), machine.outputData.at(indexI)});
+    }
+
+    newMachine.equivalentStates = CreateNewEquivalentStates(transitionsForEquivalentStates, newMachine.equivalentStates);
     SetTransitionWithNewEquivalentStates(newMachine, machine);
     return MinimizeMachine(newMachine, machine);
 }
