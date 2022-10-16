@@ -176,7 +176,9 @@ Machine MachineMinimizator::CreateNewMachineByEquivalentStates(MachineWithEquiva
     {
         for (auto index = 0; index < statesCount; index++)
         {
-            auto it = machine.equivalentStates.find(newMachine.states.at(index));
+            auto it = std::find_if(machine.equivalentStates.begin(), machine.equivalentStates.end(), [=](const std::pair<std::string, std::string>& element){
+                return element.second == newMachine.states.at(index);
+            });
             auto distance = std::distance(originMachine.states.begin(), std::find(originMachine.states.begin(), originMachine.states.end(), it->first));
             newMachine.outputData.push_back(originMachine.outputData.at(distance));
         }
