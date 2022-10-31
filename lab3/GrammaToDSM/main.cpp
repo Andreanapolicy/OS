@@ -1,7 +1,14 @@
 #include <iostream>
+#include "src/Args/ArgsParser.h"
 
-int main()
+int main(int argc, char* argv[])
 {
-    std::cout << "Hello, World!" << std::endl;
+    auto args = ArgsParser::Parse(argc, argv);
+    if (!args)
+    {
+        std::cout << "Wrong usage. Example: .exe left left-type-grammar.txt output.csv" << std::endl;
+        return 1;
+    }
+
     return 0;
 }
