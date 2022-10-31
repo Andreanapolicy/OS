@@ -1,16 +1,17 @@
 #pragma once
 
 #include <vector>
+#include <set>
 #include <string>
 
 struct MachineState
 {
-    std::string state;
+    std::set<std::string> states;
     bool isFinal = false;
 
     bool operator==(const MachineState& machineState) const
     {
-        return this->state == machineState.state && this->isFinal == machineState.isFinal;
+        return this->states == machineState.states && this->isFinal == machineState.isFinal;
     }
 };
 
@@ -20,3 +21,5 @@ struct Machine
     std::vector<std::string> states;
     std::vector<std::vector<MachineState>> machineStates;
 };
+
+constexpr auto DEFAULT_FINAL_STATE = "FINAL";

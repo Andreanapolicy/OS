@@ -10,7 +10,8 @@ public:
     static Machine ParseGrammarToMachine(std::istream& input, GrammarSide grammarSide);
 
 private:
-    static Machine ParseLeftGrammarSideToMachine(Machine& machine, std::istream& input);
 
-    static Machine ParseRightGrammarSideToMachine(Machine& machine, std::istream& input);
+    static void ParseLeftGrammarSideToMachine(Machine& machine, std::istream& input);
+
+    static void ParseRightGrammarSideToMachine(Machine& machine, std::istream& input);
 };
