@@ -1,11 +1,11 @@
 #pragma once
 
 #include <string>
-#include "../Common/GrammarType.h"
+#include "../Common/GrammarSide.h"
 
 struct Args
 {
-    GrammarType grammarType;
+    GrammarSide grammarSide;
     std::string inputFile;
     std::string outputFile;
 };

@@ -19,11 +19,11 @@ public:
 
         if (argv[1] == LEFT_GRAMMAR_TYPE_COMMAND)
         {
-            args.grammarType = GrammarType::LEFT;
+            args.grammarSide = GrammarSide::LEFT;
         }
         else if (argv[1] == RIGHT_GRAMMAR_TYPE_COMMAND)
         {
-            args.grammarType = GrammarType::RIGHT;
+            args.grammarSide = GrammarSide::RIGHT;
         }
         else
         {

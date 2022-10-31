@@ -1,6 +1,6 @@
 #pragma once
 
-enum class GrammarType
+enum class GrammarSide
 {
     LEFT,
     RIGHT,
