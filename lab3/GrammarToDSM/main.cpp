@@ -1,5 +1,6 @@
 #include <iostream>
 #include "src/Args/ArgsParser.h"
+#include "src/GrammarParser/GrammarParser.h"
 #include <fstream>
 
 bool PrepareStreams(std::ifstream& input, std::ofstream& output, const Args& args)
@@ -38,6 +39,10 @@ int main(int argc, char* argv[])
     {
         return 1;
     }
+
+    Machine machine = DSMConverter::Convert(GrammarParser::ParseGrammarToMachine(input, args->grammarSide));
+
+    MachineSaver::Save(machine);
 
     return 0;
 }

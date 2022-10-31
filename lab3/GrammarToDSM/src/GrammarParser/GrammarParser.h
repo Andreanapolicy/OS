@@ -1,11 +1,10 @@
 #pragma once
 
 #include <sstream>
+#include "../Common/GrammarSide.h"
 
 class GrammarParser
 {
 public:
-    static Machine GetLeftSideGrammar(std::istream& input);
-
-    static Machine GetRightSideGrammar(std::istream& input);
+    static Machine ParseGrammarToMachine(std::istream& input, GrammarSide grammarSide);
 };
