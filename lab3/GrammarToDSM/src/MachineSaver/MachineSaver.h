@@ -1,7 +1,9 @@
 #pragma once
 
+#include "../Machine/Machine.h"
+
 class MachineSaver
 {
 public:
-    static void SaveMachine(const Machine& machine);
+    static void Save(std::ostream& output, const Machine& machine);
 };
