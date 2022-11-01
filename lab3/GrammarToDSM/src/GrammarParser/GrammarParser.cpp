@@ -42,50 +42,58 @@ namespace
         }
     }
 
+    void AddNewStateToMachine(Machine& machine, const std::string& state)
+    {
+        auto it = std::find(machine.states.begin(), machine.states.end(), state);
+
+        if (it == machine.states.end())
+        {
+            machine.states.emplace_back(state);
+            for (auto& transitionStates: machine.machineStates)
+            {
+                if (transitionStates.size() != machine.states.size())
+                {
+                    transitionStates.emplace_back(MachineState{std::set<std::string>(), false});
+                }
+            }
+        }
+    }
+
+    void AddNewInputDataToMachine(Machine& machine, const std::string& inputData)
+    {
+        auto it = std::find(machine.inputData.begin(), machine.inputData.end(), inputData);
+
+        if (it == machine.inputData.end())
+        {
+            machine.inputData.emplace_back(inputData);
+            machine.machineStates.emplace_back(std::vector<MachineState>(machine.states.size(), MachineState{std::set<std::string>(), false}));
+        }
+    }
+
     void FillMachineByState(Machine& machine, const std::string& state,  const std::vector<Transition>& transitions)
     {
-        machine.states.emplace_back(state);
+        AddNewStateToMachine(machine, state);
+        size_t inputDataIndex = 0;
+        size_t stateIndex = std::distance(machine.states.begin(), std::find(machine.states.begin(), machine.states.end(), state));
 
         for (const auto& transition : transitions)
         {
-            size_t inputDataIndex = 0;
-            size_t stateIndex = 0;
             std::string inputData = transition.inputData;
             std::string newState = transition.state.empty() ? DEFAULT_FINAL_STATE : transition.state;
 
-            auto it = std::find(machine.inputData.begin(), machine.inputData.end(), inputData);
-
-            if (it == machine.inputData.end())
-            {
-                machine.inputData.emplace_back(inputData);
-                machine.machineStates.emplace_back(std::vector<MachineState>{});
-                inputDataIndex = machine.inputData.size() - 1;
-            }
-            else
-            {
-                inputDataIndex = std::distance(machine.inputData.begin(), it);
-            }
-
-            it = std::find(machine.states.begin(), machine.states.end(), newState);
-
-            if (it == machine.states.end())
-            {
-                machine.states.emplace_back(newState);
-                stateIndex = machine.states.size() - 1;
-            }
-            else
-            {
-                stateIndex = std::distance(machine.states.begin(), it);
-            }
+            AddNewInputDataToMachine(machine, inputData);
+            AddNewStateToMachine(machine, newState);
+            inputDataIndex = std::distance(machine.inputData.begin(), std::find(machine.inputData.begin(), machine.inputData.end(), inputData));
 
             try
             {
+                std::cout << newState << std::endl;
                 machine.machineStates.at(inputDataIndex).at(stateIndex).states.emplace(newState);
-                machine.machineStates.at(inputDataIndex).at(stateIndex).isFinal = inputData == DEFAULT_FINAL_STATE;
+                machine.machineStates.at(inputDataIndex).at(stateIndex).isFinal = newState == DEFAULT_FINAL_STATE;
             }
             catch (...)
             {
-                machine.machineStates.at(inputDataIndex).emplace_back(MachineState{std::set<std::string>{inputData}, inputData == DEFAULT_FINAL_STATE});
+                machine.machineStates.at(inputDataIndex).emplace_back(MachineState{std::set<std::string>{newState}, newState == DEFAULT_FINAL_STATE});
             }
         }
     }
