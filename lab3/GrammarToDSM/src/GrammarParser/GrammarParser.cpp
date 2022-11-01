@@ -87,7 +87,6 @@ namespace
 
             try
             {
-                std::cout << newState << std::endl;
                 machine.machineStates.at(inputDataIndex).at(stateIndex).states.emplace(newState);
                 machine.machineStates.at(inputDataIndex).at(stateIndex).isFinal = newState == DEFAULT_FINAL_STATE;
             }
@@ -103,13 +102,13 @@ Machine GrammarParser::ParseGrammarToMachine(std::istream& input, GrammarSide gr
 {
     Machine machine;
     grammarSide == GrammarSide::RIGHT
-        ? ParseRightGrammarSideToMachine(machine, input)
-        : ParseLeftGrammarSideToMachine(machine, input);
+        ? ParseGrammarToMachine(machine, input, false)
+        : ParseGrammarToMachine(machine, input, true);
 
     return machine;
 }
 
-void GrammarParser::ParseLeftGrammarSideToMachine(Machine& machine, std::istream& input)
+void GrammarParser::ParseGrammarToMachine(Machine& machine, std::istream& input, bool isLeftSideGrammar)
 {
     std::string line;
     while (std::getline(input, line))
@@ -122,12 +121,7 @@ void GrammarParser::ParseLeftGrammarSideToMachine(Machine& machine, std::istream
         iss >> trash;
 
         std::vector<Transition> transitions;
-        FillTransitions(transitions, iss, true);
+        FillTransitions(transitions, iss, isLeftSideGrammar);
         FillMachineByState(machine, state, transitions);
     }
-
-}
-
-void GrammarParser::ParseRightGrammarSideToMachine(Machine& machine, std::istream& input)
-{
 }

@@ -11,7 +11,5 @@ public:
 
 private:
 
-    static void ParseLeftGrammarSideToMachine(Machine& machine, std::istream& input);
-
-    static void ParseRightGrammarSideToMachine(Machine& machine, std::istream& input);
+    static void ParseGrammarToMachine(Machine& machine, std::istream& input, bool isLeftSideGrammar);
 };
