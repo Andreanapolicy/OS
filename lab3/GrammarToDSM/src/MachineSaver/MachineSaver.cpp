@@ -5,7 +5,6 @@
 namespace
 {
     constexpr auto SEPARATOR = ";";
-    constexpr auto STATE_SEPARATOR = "/";
     constexpr auto FINAL_STATE_SYMBOL = "F";
 
     void SaveAloneStates(std::ostream& output, const std::vector<client::MachineState>& states, bool needToSkipFirstValue = false)
