@@ -1,11 +1,11 @@
 #include "MachineSaver.h"
 #include <iostream>
-#include <iterator>
 
 namespace
 {
     constexpr auto SEPARATOR = ";";
     constexpr auto FINAL_STATE_SYMBOL = "F";
+    constexpr auto EMPTY_SYMBOL = "-";
 
     void SaveAloneStates(std::ostream& output, const std::vector<client::MachineState>& states, bool needToSkipFirstValue = false)
     {
@@ -21,6 +21,8 @@ namespace
         }
 
         output << states[states.size() - 1].states;
+
+        output << std::endl;
     }
 
     void SaveStateFinalSettings(std::ostream& output, const std::vector<client::MachineState>& states, bool needToSkipFirstValue = false)
@@ -43,6 +45,8 @@ namespace
         {
             output << FINAL_STATE_SYMBOL;
         }
+
+        output << std::endl;
     }
 
     void SaveTransitions(std::ostream& output, const client::Machine& machine)
@@ -59,6 +63,10 @@ namespace
                 output << SEPARATOR;
                 auto currentState = machine.machineStates.at(indexI).at(indexJ);
                 output << currentState;
+                if (machine.machineStates.at(indexI).at(indexJ).empty())
+                {
+                    output << EMPTY_SYMBOL;
+                }
             }
 
             output << std::endl;

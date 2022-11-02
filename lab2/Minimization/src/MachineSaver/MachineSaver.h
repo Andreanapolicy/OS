@@ -54,7 +54,6 @@ private:
                 }
             }
 
-            output << std::endl;
         }
     }
 
