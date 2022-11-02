@@ -26,9 +26,9 @@ namespace
             {
                 std::cout << compoundState << " ";
             }
-        }
 
-        std::cout << std::endl;
+            std::cout << std::endl;
+        }
     }
 
     void InitClientMachine(const DeterminationMachine& originMachine, client::Machine& newMachine)
@@ -36,12 +36,17 @@ namespace
         newMachine.inputData = originMachine.inputData;
         for (auto indexI = 0; indexI < originMachine.inputData.size(); indexI++)
         {
-            newMachine.machineStates.emplace({});
+            newMachine.machineStates.emplace_back();
 
             for (auto indexJ = 0; indexJ < originMachine.states.size(); indexJ++)
             {
                 newMachine.machineStates.at(indexI).push_back({});
             }
+        }
+
+        for (auto indexI = 0; indexI < originMachine.states.size(); indexI++)
+        {
+            newMachine.states.push_back({});
         }
     }
 

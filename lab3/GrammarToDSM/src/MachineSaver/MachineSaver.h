@@ -5,5 +5,5 @@
 class MachineSaver
 {
 public:
-    static void Save(std::ostream& output, const Machine& machine);
+    static void Save(std::ostream& output, const client::Machine& machine);
 };
