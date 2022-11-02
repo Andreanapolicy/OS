@@ -65,7 +65,7 @@ namespace
             for (auto inputDataIndex = 0; inputDataIndex < newMachine.inputData.size(); inputDataIndex++)
             {
                 auto transitionCell = originMachine.machineStates.at(inputDataIndex).at(stateIndex);
-                MergeTransition(newMachine.machineStates.at(inputDataIndex).at(stateIndex), transitionCell);
+                MergeTransition(newMachine.machineStates.at(inputDataIndex).at(newMachine.states.size() - 1), transitionCell);
             }
         }
     }
@@ -81,12 +81,22 @@ namespace
             }
         }
     }
+
+    void InitDeterminationMachine(DeterminationMachine& newMachine, const Machine& originMachine)
+    {
+        newMachine.inputData = originMachine.inputData;
+        for (auto index = 0; index < newMachine.inputData.size(); index++)
+        {
+            newMachine.machineStates.emplace_back();
+        }
+    }
 }
 
 Machine DSMConverter::ConvertToDSM(const Machine& originMachine)
 {
     DeterminationMachine newMachine;
-    newMachine.inputData = originMachine.inputData;
+    InitDeterminationMachine(newMachine, originMachine);
+
     std::vector<DeterminationState> statesToDetermination;
 
     statesToDetermination.push_back({originMachine.states.at(0)}); // just push initial state.
