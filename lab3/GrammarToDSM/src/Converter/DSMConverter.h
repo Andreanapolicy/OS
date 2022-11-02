@@ -5,5 +5,5 @@
 class DSMConverter
 {
 public:
-    static Machine ConvertToDSM(const Machine& originMachine);
+    static client::Machine ConvertToDSM(const dev::Machine& originMachine);
 };

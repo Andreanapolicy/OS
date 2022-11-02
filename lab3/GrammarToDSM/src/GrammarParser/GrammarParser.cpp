@@ -1,6 +1,8 @@
 #include "GrammarParser.h"
 #include "../Common/Utils.h"
 
+using namespace dev;
+
 namespace
 {
     struct Transition

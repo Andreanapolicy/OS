@@ -2,6 +2,7 @@
 #include "../Common/Lettering.h"
 #include <queue>
 #include <set>
+#include <unordered_map>
 #include <iostream>
 
 namespace
@@ -12,24 +13,79 @@ namespace
     {
         std::vector<std::string> inputData;
         std::vector<DeterminationState> states;
-        std::vector<std::vector<MachineState>> machineStates;
+        std::vector<std::vector<dev::MachineState>> machineStates;
     };
 
-    void LogNewStates(const DeterminationState& states, const std::string& newState)
+    void LogNewStates(const std::unordered_map<std::string, DeterminationState>& states)
     {
-        std::cout << newState << " = ";
-
         for (const auto& state : states)
         {
-            std::cout << state << " ";
+            std::cout << state.first << " = ";
+
+            for (const auto& compoundState : state.second)
+            {
+                std::cout << compoundState << " ";
+            }
         }
 
         std::cout << std::endl;
     }
 
-    Machine ConvertDeterminationMachineToMachine(const DeterminationMachine& machine)
+    void InitClientMachine(const DeterminationMachine& originMachine, client::Machine& newMachine)
     {
-        return {};
+        newMachine.inputData = originMachine.inputData;
+        for (auto indexI = 0; indexI < originMachine.inputData.size(); indexI++)
+        {
+            newMachine.machineStates.emplace({});
+
+            for (auto indexJ = 0; indexJ < originMachine.states.size(); indexJ++)
+            {
+                newMachine.machineStates.at(indexI).push_back({});
+            }
+        }
+    }
+
+    client::Machine ConvertDeterminationMachine(const DeterminationMachine& machine, const std::vector<DeterminationState>& states)
+    {
+        client::Machine newMachine;
+        InitClientMachine(machine, newMachine);
+
+        std::unordered_map<std::string, DeterminationState> newStatesNameMap;
+        for (auto index = 0; index < states.size(); index++)
+        {
+            newStatesNameMap.emplace(NEW_STATE_LETTER + std::to_string(index), states[index]);
+        }
+        LogNewStates(newStatesNameMap);
+
+        for (auto indexI = 0; indexI < machine.states.size(); indexI++)
+        {
+            auto it = std::find_if(newStatesNameMap.begin(), newStatesNameMap.end(), [&](const std::pair<std::string, DeterminationState>& element){
+                return element.second == machine.states.at(indexI);
+            });
+
+            if (it != newStatesNameMap.end())
+            {
+                newMachine.states.at(indexI).isFinal = it->second.contains(DEFAULT_FINAL_STATE);
+                newMachine.states.at(indexI).states = it->first;
+            }
+        }
+
+        for (auto indexI = 0; indexI < machine.inputData.size(); indexI++)
+        {
+            for (auto indexJ = 0; indexJ < machine.states.size(); indexJ++)
+            {
+                auto it = std::find_if(newStatesNameMap.begin(), newStatesNameMap.end(), [&](const std::pair<std::string, DeterminationState>& element){
+                    return element.second == machine.machineStates.at(indexI).at(indexJ).states;
+                });
+
+                if (it != newStatesNameMap.end())
+                {
+                    newMachine.machineStates.at(indexI).at(indexJ) = it->first;
+                }
+            }
+        }
+
+        return newMachine;
     }
 
     void AddNewStateToMachine(DeterminationMachine& machine, const DeterminationState& newState)
@@ -43,20 +99,20 @@ namespace
             {
                 if (transitionStates.size() != machine.states.size())
                 {
-                    transitionStates.emplace_back(MachineState{DeterminationState(), false});
+                    transitionStates.emplace_back(dev::MachineState{DeterminationState(), false});
                 }
             }
         }
     }
 
-    void MergeTransition(MachineState& destinationState, const MachineState& stateToMerge)
+    void MergeTransition(dev::MachineState& destinationState, const dev::MachineState& stateToMerge)
     {
         auto temp = stateToMerge.states;
         destinationState.states.merge(temp);
         destinationState.isFinal = stateToMerge.isFinal || destinationState.isFinal;
     }
 
-    void DetermineState(DeterminationMachine& newMachine, const Machine& originMachine, const DeterminationState& processingStates)
+    void DetermineState(DeterminationMachine& newMachine, const dev::Machine& originMachine, const DeterminationState& processingStates)
     {
         for (const auto& state : processingStates)
         {
@@ -82,7 +138,7 @@ namespace
         }
     }
 
-    void InitDeterminationMachine(DeterminationMachine& newMachine, const Machine& originMachine)
+    void InitDeterminationMachine(DeterminationMachine& newMachine, const dev::Machine& originMachine)
     {
         newMachine.inputData = originMachine.inputData;
         for (auto index = 0; index < newMachine.inputData.size(); index++)
@@ -92,7 +148,7 @@ namespace
     }
 }
 
-Machine DSMConverter::ConvertToDSM(const Machine& originMachine)
+client::Machine DSMConverter::ConvertToDSM(const dev::Machine& originMachine)
 {
     DeterminationMachine newMachine;
     InitDeterminationMachine(newMachine, originMachine);
@@ -110,5 +166,5 @@ Machine DSMConverter::ConvertToDSM(const Machine& originMachine)
         FillNewStatesToDetermination(newMachine, statesToDetermination);
     }
 
-    return ConvertDeterminationMachineToMachine(newMachine);
+    return ConvertDeterminationMachine(newMachine, statesToDetermination);
 }

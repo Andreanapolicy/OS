@@ -7,9 +7,9 @@
 class GrammarParser
 {
 public:
-    static Machine ParseGrammarToMachine(std::istream& input, GrammarSide grammarSide);
+    static dev::Machine ParseGrammarToMachine(std::istream& input, GrammarSide grammarSide);
 
 private:
 
-    static void ParseGrammarToMachine(Machine& machine, std::istream& input, bool isLeftSideGrammar);
+    static void ParseGrammarToMachine(dev::Machine& machine, std::istream& input, bool isLeftSideGrammar);
 };
