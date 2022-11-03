@@ -16,11 +16,11 @@ namespace
 
         for (auto index = 0; index < states.size() - 1; index++)
         {
-            output << states[index].states;
+            output << states[index].state;
             output << SEPARATOR;
         }
 
-        output << states[states.size() - 1].states;
+        output << states[states.size() - 1].state;
 
         output << std::endl;
     }

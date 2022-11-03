@@ -1,19 +1,27 @@
 #include "DSMConverter.h"
 #include "../Common/Lettering.h"
-#include <queue>
 #include <set>
 #include <unordered_map>
 #include <iostream>
 
 namespace
 {
-    using DeterminationState = std::set<std::string>;
+    struct DeterminationState
+    {
+        std::set<std::string> states;
+        bool isFinal = false;
+
+        bool operator==(const DeterminationState& machineState) const
+        {
+            return this->states == machineState.states && this->isFinal == machineState.isFinal;
+        }
+    };
 
     struct DeterminationMachine
     {
         std::vector<std::string> inputData;
         std::vector<DeterminationState> states;
-        std::vector<std::vector<dev::MachineState>> machineStates;
+        std::vector<std::vector<dev::MachineTransitionState>> machineStates;
     };
 
     void LogNewStates(const std::unordered_map<std::string, DeterminationState>& states)
@@ -22,7 +30,7 @@ namespace
         {
             std::cout << state.first << " = ";
 
-            for (const auto& compoundState : state.second)
+            for (const auto& compoundState : state.second.states)
             {
                 std::cout << compoundState << " ";
             }
@@ -70,8 +78,8 @@ namespace
 
             if (it != newStatesNameMap.end())
             {
-                newMachine.states.at(indexI).isFinal = it->second.contains(DEFAULT_FINAL_STATE);
-                newMachine.states.at(indexI).states = it->first;
+                newMachine.states.at(indexI).isFinal = it->second.isFinal;
+                newMachine.states.at(indexI).state = it->first;
             }
         }
 
@@ -80,7 +88,7 @@ namespace
             for (auto indexJ = 0; indexJ < machine.states.size(); indexJ++)
             {
                 auto it = std::find_if(newStatesNameMap.begin(), newStatesNameMap.end(), [&](const std::pair<std::string, DeterminationState>& element){
-                    return element.second == machine.machineStates.at(indexI).at(indexJ).states;
+                    return element.second.states == machine.machineStates.at(indexI).at(indexJ).states;
                 });
 
                 if (it != newStatesNameMap.end())
@@ -104,24 +112,23 @@ namespace
             {
                 if (transitionStates.size() != machine.states.size())
                 {
-                    transitionStates.emplace_back(dev::MachineState{DeterminationState(), false});
+                    transitionStates.emplace_back(dev::MachineTransitionState{DeterminationState().states});
                 }
             }
         }
     }
 
-    void MergeTransition(dev::MachineState& destinationState, const dev::MachineState& stateToMerge)
+    void MergeTransition(dev::MachineTransitionState& destinationState, const dev::MachineTransitionState& stateToMerge)
     {
         auto temp = stateToMerge.states;
         destinationState.states.merge(temp);
-        destinationState.isFinal = stateToMerge.isFinal || destinationState.isFinal;
     }
 
     void DetermineState(DeterminationMachine& newMachine, const dev::Machine& originMachine, const DeterminationState& processingStates)
     {
-        for (const auto& state : processingStates)
+        for (const auto& state : processingStates.states)
         {
-            size_t stateIndex = std::distance(originMachine.states.begin(), std::find(originMachine.states.begin(), originMachine.states.end(), state));
+            size_t stateIndex = std::distance(originMachine.states.begin(), std::find(originMachine.states.begin(), originMachine.states.end(), dev::MachineState{state, processingStates.isFinal}));
 
             for (auto inputDataIndex = 0; inputDataIndex < newMachine.inputData.size(); inputDataIndex++)
             {
@@ -131,14 +138,32 @@ namespace
         }
     }
 
-    void FillNewStatesToDetermination(const DeterminationMachine& newMachine, std::vector<DeterminationState>& statesToDetermination)
+    bool DefineIsFinalState(const std::set<std::string>& newStates, const dev::Machine& originMachine)
+    {
+        for (const auto& newState : newStates)
+        {
+            auto it = std::find_if(originMachine.states.begin(), originMachine.states.end(), [newState](const dev::MachineState& element){
+                return element.state == newState;
+            });
+
+            if (it->isFinal)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    void FillNewStatesToDetermination(const DeterminationMachine& newMachine, std::vector<DeterminationState>& statesToDetermination, const dev::Machine& originMachine)
     {
         for (const auto& transitions : newMachine.machineStates)
         {
             auto newStates = transitions.at(newMachine.states.size() - 1).states;
-            if (!newStates.empty() && std::find(statesToDetermination.begin(), statesToDetermination.end(), newStates) == statesToDetermination.end())
+            auto isFinal = DefineIsFinalState(newStates, originMachine);
+            if (!newStates.empty() && std::find(statesToDetermination.begin(), statesToDetermination.end(), DeterminationState{newStates, isFinal}) == statesToDetermination.end())
             {
-                statesToDetermination.push_back(newStates);
+                statesToDetermination.push_back({newStates, isFinal});
             }
         }
     }
@@ -153,14 +178,22 @@ namespace
     }
 }
 
-client::Machine DSMConverter::ConvertToDSM(const dev::Machine& originMachine)
+client::Machine DSMConverter::ConvertToDSM(const dev::Machine& originMachine, GrammarSide grammarSide)
 {
     DeterminationMachine newMachine;
     InitDeterminationMachine(newMachine, originMachine);
 
     std::vector<DeterminationState> statesToDetermination;
 
-    statesToDetermination.push_back({originMachine.states.at(0)}); // just push initial state.
+    if (grammarSide == GrammarSide::RIGHT)
+    {
+        statesToDetermination.push_back({{originMachine.states.at(0).state}, originMachine.states.at(0).isFinal}); // just push initial state.
+    }
+    else
+    {
+        auto initialState = std::find(originMachine.states.begin(), originMachine.states.end(), dev::MachineState{DEFAULT_FINAL_STATE, false});
+        statesToDetermination.push_back({{initialState->state}, initialState->isFinal}); // just push initial state.
+    }
 
     for (auto index = 0; index < statesToDetermination.size(); index++)
     {
@@ -168,7 +201,7 @@ client::Machine DSMConverter::ConvertToDSM(const dev::Machine& originMachine)
         AddNewStateToMachine(newMachine, processingStates);
         DetermineState(newMachine, originMachine, processingStates);
 
-        FillNewStatesToDetermination(newMachine, statesToDetermination);
+        FillNewStatesToDetermination(newMachine, statesToDetermination, originMachine);
     }
 
     return ConvertDeterminationMachine(newMachine, statesToDetermination);
