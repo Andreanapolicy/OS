@@ -6,22 +6,27 @@
 
 namespace dev
 {
-    struct MachineState
+    struct MachineTransitionState
     {
         std::set<std::string> states;
+    };
+
+    struct MachineState
+    {
+        std::string state;
         bool isFinal = false;
 
         bool operator==(const MachineState& machineState) const
         {
-            return this->states == machineState.states && this->isFinal == machineState.isFinal;
+            return this->state == machineState.state && this->isFinal == machineState.isFinal;
         }
     };
 
     struct Machine
     {
         std::vector<std::string> inputData;
-        std::vector<std::string> states;
-        std::vector<std::vector<MachineState>> machineStates;
+        std::vector<MachineState> states;
+        std::vector<std::vector<MachineTransitionState>> machineStates;
     };
 }
 
@@ -29,12 +34,12 @@ namespace client
 {
     struct MachineState
     {
-        std::string states;
+        std::string state;
         bool isFinal = false;
 
         bool operator==(const MachineState& machineState) const
         {
-            return this->states == machineState.states && this->isFinal == machineState.isFinal;
+            return this->state == machineState.state && this->isFinal == machineState.isFinal;
         }
     };
 

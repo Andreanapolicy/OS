@@ -44,10 +44,10 @@ namespace
         }
     }
 
-    void AddNewStateToMachine(Machine& machine, const std::string& state)
+    void AddNewStateToMachine(Machine& machine, const MachineState& state)
     {
-        auto it = std::find(machine.states.begin(), machine.states.end(), state);
-
+        auto it = std::find_if(machine.states.begin(), machine.states.end(), [state](const MachineState& element){ return element.state == state.state; });
+//        auto it = std::find_if(machine.states.begin(), machine.states.end(), [](){});
         if (it == machine.states.end())
         {
             machine.states.emplace_back(state);
@@ -55,7 +55,7 @@ namespace
             {
                 if (transitionStates.size() != machine.states.size())
                 {
-                    transitionStates.emplace_back(MachineState{std::set<std::string>(), false});
+                    transitionStates.emplace_back(MachineTransitionState{std::set<std::string>()});
                 }
             }
         }
@@ -68,41 +68,51 @@ namespace
         if (it == machine.inputData.end())
         {
             machine.inputData.emplace_back(inputData);
-            machine.machineStates.emplace_back(std::vector<MachineState>(machine.states.size(), MachineState{std::set<std::string>(), false}));
+            machine.machineStates.emplace_back(std::vector<MachineTransitionState>(machine.states.size(), MachineTransitionState{std::set<std::string>()}));
         }
     }
 
     void FillMachineByState(Machine& machine, const std::string& state,  const std::vector<Transition>& transitions, bool isLeftSideGrammar)
     {
-        AddNewStateToMachine(machine, state);
+        auto isFinal = false;
+        if (isLeftSideGrammar)
+        {
+            isFinal = machine.states.empty();
+        }
+        AddNewStateToMachine(machine, {state, isFinal});
+
         size_t inputDataIndex = 0;
-        size_t stateIndex = std::distance(machine.states.begin(), std::find(machine.states.begin(), machine.states.end(), state));
+        size_t stateIndex = std::distance(machine.states.begin(), std::find(machine.states.begin(), machine.states.end(), MachineState{state, isFinal}));
+        isFinal = false;
 
         for (const auto& transition : transitions)
         {
             std::string inputData = transition.inputData;
             std::string newState = transition.state.empty() ? DEFAULT_FINAL_STATE : transition.state;
 
+            if (!isLeftSideGrammar)
+            {
+                isFinal = newState == DEFAULT_FINAL_STATE;
+            }
+
             AddNewInputDataToMachine(machine, inputData);
-            AddNewStateToMachine(machine, newState);
+            AddNewStateToMachine(machine, {newState, isFinal});
             inputDataIndex = std::distance(machine.inputData.begin(), std::find(machine.inputData.begin(), machine.inputData.end(), inputData));
-            bool isFinal = newState == DEFAULT_FINAL_STATE;
 
             if (isLeftSideGrammar)
             {
-                stateIndex = std::distance(machine.states.begin(), std::find(machine.states.begin(), machine.states.end(), newState));
+                stateIndex = std::distance(machine.states.begin(), std::find_if(machine.states.begin(), machine.states.end(),
+                                                                                [newState](const MachineState& element){ return element.state == newState; }));
                 newState = state;
-                isFinal = std::find(machine.states.begin(), machine.states.end(), newState) == machine.states.begin();
             }
 
             try
             {
                 machine.machineStates.at(inputDataIndex).at(stateIndex).states.emplace(newState);
-                machine.machineStates.at(inputDataIndex).at(stateIndex).isFinal = isFinal;
             }
             catch (...)
             {
-                machine.machineStates.at(inputDataIndex).emplace_back(MachineState{std::set<std::string>{newState}, newState == DEFAULT_FINAL_STATE});
+                machine.machineStates.at(inputDataIndex).emplace_back(MachineTransitionState{std::set<std::string>{newState}});
             }
         }
     }

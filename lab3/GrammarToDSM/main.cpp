@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    auto machine = DSMConverter::ConvertToDSM(GrammarParser::ParseGrammarToMachine(input, args->grammarSide));
+    auto machine = DSMConverter::ConvertToDSM(GrammarParser::ParseGrammarToMachine(input, args->grammarSide), args->grammarSide);
 
     MachineSaver::Save(output, machine);
 
