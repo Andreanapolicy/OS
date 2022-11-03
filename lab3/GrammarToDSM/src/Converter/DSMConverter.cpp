@@ -191,7 +191,7 @@ client::Machine DSMConverter::ConvertToDSM(const dev::Machine& originMachine, Gr
     }
     else
     {
-        auto initialState = std::find(originMachine.states.begin(), originMachine.states.end(), dev::MachineState{DEFAULT_FINAL_STATE, false});
+        auto initialState = std::find(originMachine.states.begin(), originMachine.states.end(), dev::MachineState{DEFAULT_UNNAMED_STATE, false});
         statesToDetermination.push_back({{initialState->state}, initialState->isFinal}); // just push initial state.
     }
 

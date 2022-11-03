@@ -88,11 +88,11 @@ namespace
         for (const auto& transition : transitions)
         {
             std::string inputData = transition.inputData;
-            std::string newState = transition.state.empty() ? DEFAULT_FINAL_STATE : transition.state;
+            std::string newState = transition.state.empty() ? DEFAULT_UNNAMED_STATE : transition.state;
 
             if (!isLeftSideGrammar)
             {
-                isFinal = newState == DEFAULT_FINAL_STATE;
+                isFinal = newState == DEFAULT_UNNAMED_STATE;
             }
 
             AddNewInputDataToMachine(machine, inputData);

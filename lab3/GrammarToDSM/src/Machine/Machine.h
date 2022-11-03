@@ -51,4 +51,4 @@ namespace client
     };
 }
 
-constexpr auto DEFAULT_FINAL_STATE = "FINAL";
+constexpr auto DEFAULT_UNNAMED_STATE = "UNNAMED";
