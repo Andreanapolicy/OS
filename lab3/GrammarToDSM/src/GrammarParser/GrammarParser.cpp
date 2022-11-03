@@ -72,7 +72,7 @@ namespace
         }
     }
 
-    void FillMachineByState(Machine& machine, const std::string& state,  const std::vector<Transition>& transitions)
+    void FillMachineByState(Machine& machine, const std::string& state,  const std::vector<Transition>& transitions, bool isLeftSideGrammar)
     {
         AddNewStateToMachine(machine, state);
         size_t inputDataIndex = 0;
@@ -86,11 +86,19 @@ namespace
             AddNewInputDataToMachine(machine, inputData);
             AddNewStateToMachine(machine, newState);
             inputDataIndex = std::distance(machine.inputData.begin(), std::find(machine.inputData.begin(), machine.inputData.end(), inputData));
+            bool isFinal = newState == DEFAULT_FINAL_STATE;
+
+            if (isLeftSideGrammar)
+            {
+                stateIndex = std::distance(machine.states.begin(), std::find(machine.states.begin(), machine.states.end(), newState));
+                newState = state;
+                isFinal = std::find(machine.states.begin(), machine.states.end(), newState) == machine.states.begin();
+            }
 
             try
             {
                 machine.machineStates.at(inputDataIndex).at(stateIndex).states.emplace(newState);
-                machine.machineStates.at(inputDataIndex).at(stateIndex).isFinal = newState == DEFAULT_FINAL_STATE;
+                machine.machineStates.at(inputDataIndex).at(stateIndex).isFinal = isFinal;
             }
             catch (...)
             {
@@ -124,6 +132,6 @@ void GrammarParser::ParseGrammarToMachine(Machine& machine, std::istream& input,
 
         std::vector<Transition> transitions;
         FillTransitions(transitions, iss, isLeftSideGrammar);
-        FillMachineByState(machine, state, transitions);
+        FillMachineByState(machine, state, transitions, isLeftSideGrammar);
     }
 }
