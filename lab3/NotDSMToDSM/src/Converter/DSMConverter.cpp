@@ -1,5 +1,6 @@
 #include "DSMConverter.h"
 #include "../Common/Lettering.h"
+#include "EmptyStateRemover/EmptyStateRemover.h"
 #include <set>
 #include <unordered_map>
 #include <iostream>
@@ -180,6 +181,8 @@ namespace
 
 client::Machine DSMConverter::ConvertToDSM(const dev::Machine& originMachine)
 {
+    auto nonEmptyTransitions = EmptyStateRemover::GenerateNonEmptyTransitions(originMachine);
+
     DeterminationMachine newMachine;
     InitDeterminationMachine(newMachine, originMachine);
 
