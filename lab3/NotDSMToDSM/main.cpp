@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
     }
     MachineSaver machineSaver;
 
-    machineSaver.Save(output, DSMConverter::ConvertToDSM(CSVTextParser::GetMoore(input)));
+    machineSaver.Save(output, DSMConverter::ConvertToDSM(CSVTextParser::GetMachine(input)));
 
     return 0;
 }

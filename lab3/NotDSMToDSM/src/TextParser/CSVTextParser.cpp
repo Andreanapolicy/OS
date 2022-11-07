@@ -51,23 +51,18 @@ size_t CSVTextParser::GetFinalStatePosition(std::istream& istream)
 
 void CSVTextParser::FillMachineStateTransitions(Machine& machine, std::vector<std::string>& transitions)
 {
-    std::vector<MachineState> machineStates;
+    std::vector<MachineTransitionState> machineStates;
 
     for (const auto& transition : transitions)
     {
-        MachineState state;
-        auto index = transition.find("/");
-        if (index != std::string::npos)
+        MachineTransitionState state;
+        std::istringstream iss(transition);
+        std::string stateStr;
+        while(std::getline(iss, stateStr, ','))
         {
-            state.state = transition.substr(0, index);
-            state.outputData = transition.substr(index + 1, transition.length());
+            state.state.emplace(stateStr);
         }
-        else
-        {
-            auto it = std::find(machine.states.begin(), machine.states.end(), transition);
-            state.state = transition;
-            state.outputData = machine.outputData.at(std::distance(machine.states.begin(), it));
-        }
+
         machineStates.push_back(state);
     }
 
