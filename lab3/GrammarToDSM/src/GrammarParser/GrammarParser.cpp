@@ -47,7 +47,7 @@ namespace
     void AddNewStateToMachine(Machine& machine, const MachineState& state)
     {
         auto it = std::find_if(machine.states.begin(), machine.states.end(), [state](const MachineState& element){ return element.state == state.state; });
-//        auto it = std::find_if(machine.states.begin(), machine.states.end(), [](){});
+
         if (it == machine.states.end())
         {
             machine.states.emplace_back(state);
@@ -74,7 +74,7 @@ namespace
 
     void FillMachineByState(Machine& machine, const std::string& state,  const std::vector<Transition>& transitions, bool isLeftSideGrammar)
     {
-        auto isFinal = false;
+        bool isFinal = false;
         if (isLeftSideGrammar)
         {
             isFinal = machine.states.empty();
