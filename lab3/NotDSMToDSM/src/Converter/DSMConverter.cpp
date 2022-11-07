@@ -177,6 +177,21 @@ namespace
             newMachine.machineStates.emplace_back();
         }
     }
+
+    DeterminationState DefineDeterminationState(const NonEmptyTransitions& nonEmptyTransitions, const std::set<std::string>& machineStates, const dev::Machine& originMachine)
+    {
+        DeterminationState newState;
+
+        for(const auto& states : machineStates)
+        {
+            auto it = nonEmptyTransitions.find(states);
+            newState.states.insert(it->second.begin(), it->second.end());
+        }
+
+        newState.isFinal = DefineIsFinalState(newState.states, originMachine);
+
+        return newState;
+    }
 }
 
 client::Machine DSMConverter::ConvertToDSM(const dev::Machine& originMachine)
@@ -188,7 +203,7 @@ client::Machine DSMConverter::ConvertToDSM(const dev::Machine& originMachine)
 
     std::vector<DeterminationState> statesToDetermination;
 
-    statesToDetermination.push_back({{originMachine.states.at(0).state}, originMachine.states.at(0).isFinal});
+    statesToDetermination.push_back(DefineDeterminationState(m_notEmptyTransitions, {originMachine.states.at(0).state}, originMachine));
 
     for (auto index = 0; index < statesToDetermination.size(); index++)
     {
