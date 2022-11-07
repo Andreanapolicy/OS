@@ -41,8 +41,9 @@ int main(int argc, char* argv[])
     {
         return 1;
     }
+    auto dsmConverter = new DSMConverter();
 
-    MachineSaver::Save(output, DSMConverter::ConvertToDSM(CSVTextParser::GetMachine(input)));
+    MachineSaver::Save(output, dsmConverter->ConvertToDSM(CSVTextParser::GetMachine(input)));
 
     return 0;
 }

@@ -181,7 +181,7 @@ namespace
 
 client::Machine DSMConverter::ConvertToDSM(const dev::Machine& originMachine)
 {
-    auto nonEmptyTransitions = EmptyStateRemover::GenerateNonEmptyTransitions(originMachine);
+    m_notEmptyTransitions = EmptyStateRemover::GenerateNonEmptyTransitions(originMachine);
 
     DeterminationMachine newMachine;
     InitDeterminationMachine(newMachine, originMachine);

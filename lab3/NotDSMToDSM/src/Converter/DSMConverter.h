@@ -1,9 +1,13 @@
 #pragma once
 
 #include "../Machine/Machine.h"
+#include "EmptyStateRemover/EmptyStateRemover.h"
 
 class DSMConverter
 {
 public:
-    static client::Machine ConvertToDSM(const dev::Machine& originMachine);
+    client::Machine ConvertToDSM(const dev::Machine& originMachine);
+
+private:
+    NonEmptyTransitions m_notEmptyTransitions = {};
 };

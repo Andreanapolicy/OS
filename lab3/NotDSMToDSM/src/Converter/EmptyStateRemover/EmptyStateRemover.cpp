@@ -26,7 +26,7 @@ namespace
     }
 }
 
-EmptyStateRemover::NonEmptyTransitions EmptyStateRemover::GenerateNonEmptyTransitions(const Machine& machine)
+NonEmptyTransitions EmptyStateRemover::GenerateNonEmptyTransitions(const Machine& machine)
 {
     NonEmptyTransitions newTransitions;
 
