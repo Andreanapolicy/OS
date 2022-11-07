@@ -30,7 +30,7 @@ public:
 private:
     void static ProcessTypicalMachineInputData(std::istream& istream, Machine& machine);
 
-    void static ProcessSpecificMachineInputData(std::istream& istream, Machine& machine);
+    size_t static GetFinalStatePosition(std::istream& istream);
 
     void static FillMachineStateTransitions(Machine& machine, std::vector<std::string>& transitions);
 

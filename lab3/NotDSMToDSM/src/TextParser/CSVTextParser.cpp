@@ -1,4 +1,5 @@
 #include "CSVTextParser.h"
+#include "../Common/Lettering.h"
 
 namespace
 {
@@ -21,7 +22,10 @@ void CSVTextParser::ProcessTypicalMachineInputData(std::istream& istream, Machin
     std::vector<std::string> parsedLine;
     ParseLine(line, parsedLine);
     parsedLine.erase(parsedLine.begin());
-    machine.states = parsedLine;
+    for (const auto& value : parsedLine)
+    {
+        machine.states.push_back({value, false});
+    }
 
     while (std::getline(istream, line))
     {
@@ -33,14 +37,16 @@ void CSVTextParser::ProcessTypicalMachineInputData(std::istream& istream, Machin
     }
 }
 
-void CSVTextParser::ProcessSpecificMachineInputData(std::istream& istream, Machine& machine)
+size_t CSVTextParser::GetFinalStatePosition(std::istream& istream)
 {
     std::string line;
     std::getline(istream, line);
     std::vector<std::string> parsedLine;
     ParseLine(line, parsedLine);
     parsedLine.erase(parsedLine.begin());
-    machine.outputData = parsedLine;
+    auto it = std::find(parsedLine.begin(), parsedLine.end(), FINAL_STATE_LETTER);
+
+    return std::distance(parsedLine.begin(), it);
 }
 
 void CSVTextParser::FillMachineStateTransitions(Machine& machine, std::vector<std::string>& transitions)
@@ -70,5 +76,12 @@ void CSVTextParser::FillMachineStateTransitions(Machine& machine, std::vector<st
 
 Machine CSVTextParser::GetMachine(std::istream& istream)
 {
-    return Machine();
+    Machine machine = {};
+
+    auto finalStatePos = GetFinalStatePosition(istream);
+    ProcessTypicalMachineInputData(istream, machine);
+
+    machine.states.at(finalStatePos).isFinal = true;
+
+    return machine;
 }
