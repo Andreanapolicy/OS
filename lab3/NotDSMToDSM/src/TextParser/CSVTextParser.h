@@ -3,6 +3,8 @@
 #include <sstream>
 #include "../Machine/Machine.h"
 
+using namespace dev;
+
 class CSVTextParser
 {
 public:

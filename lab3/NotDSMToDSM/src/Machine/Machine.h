@@ -4,20 +4,49 @@
 #include <string>
 #include <set>
 
-struct MachineState
+namespace client
 {
-    std::string state;
-    bool isFinal = false;
-};
+    struct MachineState
+    {
+        std::string state;
+        bool isFinal = false;
 
-struct MachineTransitionState
-{
-    std::set<std::string> state;
-};
+        bool operator==(const MachineState& machineState) const
+        {
+            return this->state == machineState.state && this->isFinal == machineState.isFinal;
+        }
+    };
 
-struct Machine
+    struct Machine
+    {
+        std::vector<std::string> inputData;
+        std::vector<MachineState> states;
+        std::vector<std::vector<std::string>> machineStates;
+    };
+}
+
+namespace dev
 {
-    std::vector<std::string> inputData;
-    std::vector<MachineState> states;
-    std::vector<std::vector<MachineTransitionState>> machineStates;
-};
+    struct MachineTransitionState
+    {
+        std::set<std::string> states;
+    };
+
+    struct MachineState
+    {
+        std::string state;
+        bool isFinal = false;
+
+        bool operator==(const MachineState& machineState) const
+        {
+            return this->state == machineState.state && this->isFinal == machineState.isFinal;
+        }
+    };
+
+    struct Machine
+    {
+        std::vector<std::string> inputData;
+        std::vector<MachineState> states;
+        std::vector<std::vector<MachineTransitionState>> machineStates;
+    };
+}

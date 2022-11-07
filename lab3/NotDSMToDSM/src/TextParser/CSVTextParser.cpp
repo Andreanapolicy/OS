@@ -60,7 +60,7 @@ void CSVTextParser::FillMachineStateTransitions(Machine& machine, std::vector<st
         std::string stateStr;
         while(std::getline(iss, stateStr, ','))
         {
-            state.state.emplace(stateStr);
+            state.states.emplace(stateStr);
         }
 
         machineStates.push_back(state);
