@@ -172,6 +172,8 @@ namespace
     void InitDeterminationMachine(DeterminationMachine& newMachine, const dev::Machine& originMachine)
     {
         newMachine.inputData = originMachine.inputData;
+        newMachine.inputData.erase(newMachine.inputData.end() - 1); // delete `e` input data
+
         for (auto index = 0; index < newMachine.inputData.size(); index++)
         {
             newMachine.machineStates.emplace_back();
