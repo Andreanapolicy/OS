@@ -1,8 +1,8 @@
 #include <iostream>
 #include "src/Args/ArgsParser.h"
-#include "src/GrammarParser/GrammarParser.h"
 #include "src/Converter/DSMConverter.h"
 #include "src/MachineSaver/MachineSaver.h"
+#include "src/TextParser/CSVTextParser.h"
 #include <fstream>
 
 bool PrepareStreams(std::ifstream& input, std::ofstream& output, const Args& args)
@@ -41,10 +41,9 @@ int main(int argc, char* argv[])
     {
         return 1;
     }
+    MachineSaver machineSaver;
 
-    auto machine = DSMConverter::ConvertToDSM(GrammarParser::ParseGrammarToMachine(input, args->grammarSide), args->grammarSide);
-
-    MachineSaver::Save(output, machine);
+    machineSaver.Save(output, DSMConverter::ConvertToDSM(CSVTextParser::GetMoore(input)));
 
     return 0;
 }

@@ -178,22 +178,14 @@ namespace
     }
 }
 
-client::Machine DSMConverter::ConvertToDSM(const dev::Machine& originMachine, GrammarSide grammarSide)
+client::Machine DSMConverter::ConvertToDSM(const dev::Machine& originMachine)
 {
     DeterminationMachine newMachine;
     InitDeterminationMachine(newMachine, originMachine);
 
     std::vector<DeterminationState> statesToDetermination;
 
-    if (grammarSide == GrammarSide::RIGHT)
-    {
-        statesToDetermination.push_back({{originMachine.states.at(0).state}, originMachine.states.at(0).isFinal}); // just push initial state.
-    }
-    else
-    {
-        auto initialState = std::find(originMachine.states.begin(), originMachine.states.end(), dev::MachineState{DEFAULT_UNNAMED_STATE, false});
-        statesToDetermination.push_back({{initialState->state}, initialState->isFinal}); // just push initial state.
-    }
+    statesToDetermination.push_back({{originMachine.states.at(0).state}, originMachine.states.at(0).isFinal});
 
     for (auto index = 0; index < statesToDetermination.size(); index++)
     {
