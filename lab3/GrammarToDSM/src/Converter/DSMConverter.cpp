@@ -128,7 +128,10 @@ namespace
     {
         for (const auto& state : processingStates.states)
         {
-            size_t stateIndex = std::distance(originMachine.states.begin(), std::find(originMachine.states.begin(), originMachine.states.end(), dev::MachineState{state, processingStates.isFinal}));
+            auto it = std::find_if(originMachine.states.begin(), originMachine.states.end(), [state](const dev::MachineState& element){
+                return element.state == state;
+            });
+            size_t stateIndex = std::distance(originMachine.states.begin(), it);
 
             for (auto inputDataIndex = 0; inputDataIndex < newMachine.inputData.size(); inputDataIndex++)
             {
