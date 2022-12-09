@@ -74,11 +74,8 @@ namespace
 
     void FillMachineByState(Machine& machine, const std::string& state,  const std::vector<Transition>& transitions, bool isLeftSideGrammar)
     {
-        bool isFinal = false;
-        if (isLeftSideGrammar)
-        {
-            isFinal = machine.states.empty();
-        }
+        bool isFinal = isLeftSideGrammar && machine.states.empty();
+
         AddNewStateToMachine(machine, {state, isFinal});
 
         size_t inputDataIndex = 0;
