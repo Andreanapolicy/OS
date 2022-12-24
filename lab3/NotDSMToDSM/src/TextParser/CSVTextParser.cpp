@@ -66,6 +66,14 @@ void CSVTextParser::FillMachineStateTransitions(Machine& machine, std::vector<st
         machineStates.push_back(state);
     }
 
+    if (machineStates.size() < machine.states.size())
+    {
+        for (auto index = 0; index < machineStates.size() - machine.states.size(); index++)
+        {
+            machineStates.push_back({});
+        }
+    }
+
     machine.machineStates.push_back(machineStates);
 }
 
