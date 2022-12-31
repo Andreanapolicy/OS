@@ -1,3 +1,6 @@
 [submodule "lab5/Recursive-Descent"]
 	path = lab5/Recursive-Descent
 	url = https://github.com/Andreanapolicy/Recursive-Descent.git
+[submodule "lab6/LL"]
+	path = lab6/LL
+	url = https://github.com/Andreanapolicy/LL.git
