@@ -4,3 +4,6 @@
 [submodule "lab6/LL"]
 	path = lab6/LL
 	url = https://github.com/Andreanapolicy/LL.git
+[submodule "lab7/Lexer"]
+	path = lab7/Lexer
+	url = https://github.com/Andreanapolicy/Lexer.git
