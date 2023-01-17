@@ -3,6 +3,11 @@
 #include <sstream>
 #include "../Machine/Machine.h"
 
+namespace
+{
+	constexpr auto EMPTY_OUTPUT_SYMBOL = "empty";
+}
+
 class CSVTextParser
 {
 public:
@@ -87,6 +92,10 @@ private:
 
         while (std::getline(ss, state, ';'))
         {
+			if (state.empty())
+			{
+				state = EMPTY_OUTPUT_SYMBOL;
+			}
             states.push_back(state);
         }
     }
